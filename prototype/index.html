@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Асси — устройства и подключения</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="preview-bar"><span><b>Асси</b> · интерактивный макет</span><span class="preview-note">Демоданные · без удалённого доступа</span><button id="preview-toggle">Мобильный вид</button></div>
+  <div class="app-frame" id="frame">
+    <header class="app-header">
+      <a class="brand" href="#devices" aria-label="Асси, устройства"><span class="brand-mark" aria-hidden="true"><i></i><i></i></span><span>асси</span></a>
+      <form class="search" id="search-form" role="search"><span data-icon="search"></span><input id="search" type="search" placeholder="Имя устройства или код" aria-label="Поиск по имени устройства или коду" autocomplete="off"><kbd aria-hidden="true">⌘ K</kbd></form>
+      <button class="icon-button theme-button" id="theme-toggle" aria-label="Включить светлую тему" title="Переключить тему"><span data-icon="sun"></span></button>
+    </header>
+    <div class="workspace">
+      <aside class="sidebar">
+        <div class="sidebar-heading"><h1>Устройства</h1><div class="view-switch" aria-label="Вид устройств"><button id="detail-view" aria-label="Подробный вид" aria-pressed="true" title="Подробный вид"><span data-icon="grid"></span></button><button id="list-view" aria-label="Список устройств" aria-pressed="false" title="Список устройств"><span data-icon="list"></span></button></div></div>
+        <div id="sidebar-devices"></div>
+        <button class="button add-button" id="add-device"><span data-icon="plus"></span>Добавить устройство</button>
+        <nav class="desktop-nav" aria-label="Разделы приложения"><button data-page="devices" aria-current="page"><span data-icon="monitor"></span>Устройства</button><button data-page="sessions"><span data-icon="layers"></span>Сеансы <span class="session-count" hidden>0</span></button><button data-page="settings"><span data-icon="settings"></span>Настройки</button></nav>
+      </aside>
+      <main id="main" tabindex="-1"></main>
+    </div>
+    <footer class="access-bar"><div class="own-code"><span class="code-symbol" data-icon="link"></span><span class="code-label">Ваш код</span><strong>584 209 176</strong><button class="icon-button" data-action="copy" aria-label="Скопировать свой демо-код" title="Скопировать код"><span data-icon="copy"></span></button></div><button class="button access-button" data-action="access"><span data-icon="monitor"></span>Предоставить доступ</button></footer>
+    <nav class="mobile-nav" aria-label="Мобильная навигация"><button data-page="devices" aria-current="page"><span data-icon="home"></span>Устройства</button><button data-page="sessions"><span data-icon="layers"></span>Сеансы <span class="session-count" hidden>0</span></button><button data-page="settings"><span data-icon="settings"></span>Настройки</button></nav>
+  </div>
+  <p id="result-status" class="sr-only" role="status"></p>
+  <dialog id="dialog" aria-labelledby="dialog-title"><div class="dialog-header"><h2 id="dialog-title"></h2><button class="icon-button" id="close-dialog" aria-label="Закрыть окно"><span data-icon="close"></span></button></div><div id="dialog-content"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>

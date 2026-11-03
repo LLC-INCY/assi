@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-access-enable"
+description = "Enables the access_enable command without any pre-configured scope."
+commands.allow = ["access_enable"]
+
+[[permission]]
+identifier = "deny-access-enable"
+description = "Denies the access_enable command without any pre-configured scope."
+commands.deny = ["access_enable"]

@@ -1,0 +1,6 @@
+// Isolated compile/test hook; never packaged into the application.
+settingsEvaluated { settings ->
+    if (settings.settingsDir.name != 'android' || !new File(settings.settingsDir, 'app').isDirectory()) return
+    settings.include(':assi-capture-validation')
+    settings.project(':assi-capture-validation').projectDir = new File(settings.settingsDir, '../../../android-host/android')
+}

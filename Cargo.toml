@@ -1,0 +1,19 @@
+[workspace]
+members = ["crates/assi-core", "crates/assi-session", "crates/assi-relay", "crates/assi-platform", "crates/assi-audio", "crates/assi-video", "crates/assi-access", "crates/assi-terminal", "crates/assi-folders", "apps/client/src-tauri", "apps/client/android-host"]
+default-members = ["crates/assi-core"]
+resolver = "2"
+
+[workspace.package]
+version = "0.6.0"
+edition = "2021"
+rust-version = "1.94"
+license = "LicenseRef-Assi-NoSale-1.0"
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+thiserror = "2"
+uuid = { version = "1", features = ["v4", "serde"] }
+
+[profile.release]
+lto = "thin"
+strip = true

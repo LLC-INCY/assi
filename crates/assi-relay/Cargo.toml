@@ -1,0 +1,20 @@
+[package]
+name = "assi-relay"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+base64 = "0.22"
+rcgen = { version = "0.14.10", default-features = false, features = ["crypto", "ring"] }
+ring = "0.17"
+serde.workspace = true
+serde_json = "1"
+subtle = "2.6"
+thiserror.workspace = true
+tokio = { version = "1", features = ["net", "sync", "time", "io-util", "rt-multi-thread", "macros", "signal"] }
+tokio-rustls = { version = "0.26.6", default-features = false, features = ["ring", "tls12"] }
+
+[dev-dependencies]
+tempfile = "3"

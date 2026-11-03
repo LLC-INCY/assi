@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-recording-abort"
+description = "Enables the recording_abort command without any pre-configured scope."
+commands.allow = ["recording_abort"]
+
+[[permission]]
+identifier = "deny-recording-abort"
+description = "Denies the recording_abort command without any pre-configured scope."
+commands.deny = ["recording_abort"]

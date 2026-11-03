@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="180" viewBox="0 0 680 180" role="img" aria-labelledby="title desc">
+  <title id="title">Асси</title>
+  <desc id="desc">Удалённый доступ. Ближе к своим устройствам.</desc>
+  <rect width="680" height="180" rx="28" fill="#171c20"/>
+  <g fill="#a5f3d1" transform="translate(52 55)">
+    <rect x="13" y="0" width="21" height="65" rx="10.5" transform="rotate(36 24 33)"/>
+    <rect x="40" y="0" width="21" height="65" rx="10.5" transform="rotate(36 51 33)"/>
+  </g>
+  <text x="153" y="95" fill="#f5f7f6" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="61" font-weight="650" letter-spacing="-2">асси</text>
+  <text x="156" y="130" fill="#aab7b2" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="17">Ваши устройства. Одно пространство.</text>
+</svg>

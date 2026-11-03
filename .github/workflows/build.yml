@@ -1,0 +1,178 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+  MACOSX_DEPLOYMENT_TARGET: '13.0'
+
+jobs:
+  quality:
+    name: Tests and lint
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8
+        with:
+          toolchain: '1.94.1'
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+        with:
+          shared-key: quality
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+      - run: npm ci
+      - run: npm run ui:build
+      - run: node --test scripts/ci-*.test.mjs
+      - run: npm run check
+
+  desktop:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows x64
+            os: windows-2022
+            target: x86_64-pc-windows-msvc
+            bundles: nsis
+            artifact: windows-x64
+          - name: Linux x64
+            os: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+            bundles: deb,appimage
+            artifact: linux-x64
+          - name: macOS Apple Silicon
+            os: macos-15
+            target: aarch64-apple-darwin
+            bundles: app
+            artifact: macos-arm64
+          - name: macOS Intel
+            os: macos-15-intel
+            target: x86_64-apple-darwin
+            bundles: app
+            artifact: macos-x64
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential pkg-config libwebkit2gtk-4.1-dev libxdo-dev \
+            libssl-dev libayatana-appindicator3-dev librsvg2-dev patchelf \
+            libclang-dev libxcb1-dev libxcb-randr0-dev libxcb-shape0-dev \
+            libxcb-xfixes0-dev libxrandr-dev libdbus-1-dev libpipewire-0.3-dev \
+            libwayland-dev libegl-dev libxkbcommon-dev libxkbcommon-x11-dev
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8
+        with:
+          toolchain: '1.94.1'
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+        with:
+          shared-key: desktop-${{ matrix.target }}
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+      - run: npm ci
+      - name: Build desktop packages
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: '1'
+        run: npm run build -- --ci --target ${{ matrix.target }} --bundles ${{ matrix.bundles }} -- --locked
+      - name: Archive macOS app with permissions and symlinks
+        if: runner.os == 'macOS'
+        run: ditto -c -k --sequesterRsrc --keepParent "target/${{ matrix.target }}/release/bundle/macos/Асси.app" "target/${{ matrix.target }}/release/bundle/assi-${{ matrix.artifact }}.zip"
+      - name: Validate Debian package metadata
+        if: runner.os == 'Linux'
+        run: |
+          for package_file in target/${{ matrix.target }}/release/bundle/deb/*.deb; do
+            package_name=$(dpkg-deb --field "$package_file" Package)
+            [[ "$package_name" =~ ^[a-z0-9][a-z0-9+.-]+$ ]]
+            dpkg-deb --info "$package_file"
+            dpkg-deb --contents "$package_file" > /dev/null
+          done
+      - name: Collect packages and checksums
+        run: node scripts/ci-artifacts.mjs "target/${{ matrix.target }}/release/bundle" "${{ matrix.artifact }}"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: assi-${{ matrix.artifact }}-${{ github.sha }}
+          path: ci-artifacts/*
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+
+  android:
+    name: Android arm64 APK
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
+      - name: Install Android toolchain
+        run: |
+          sdkmanager 'platform-tools' 'platforms;android-37' 'build-tools;36.0.0' 'ndk;27.2.12479018'
+          echo "NDK_HOME=$ANDROID_HOME/ndk/27.2.12479018" >> "$GITHUB_ENV"
+      - uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8
+        with:
+          toolchain: '1.94.1'
+          targets: aarch64-linux-android
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+        with:
+          shared-key: android-arm64
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+      - run: npm ci
+      - name: Generate and configure native project
+        run: npm run android:init
+      - name: Build installable development APK
+        # Debug signing is generated on the runner. No release keystore is stored.
+        run: npm run android:build -- -- --locked
+      - name: Test Android capture lifecycle
+        working-directory: apps/client/src-tauri/gen/android
+        run: ./gradlew --no-daemon -I ../../../android-host/validation.init.gradle :assi-capture-validation:testDebugUnitTest
+      - name: Collect APK and checksum
+        run: node scripts/ci-artifacts.mjs apps/client/src-tauri/gen/android/app/build/outputs/apk/universal/debug android-arm64-debug
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: assi-android-arm64-debug-${{ github.sha }}
+          path: ci-artifacts/*
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14

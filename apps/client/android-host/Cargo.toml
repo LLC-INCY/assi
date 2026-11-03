@@ -1,0 +1,19 @@
+[package]
+name = "tauri-plugin-assi-capture"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+links = "tauri-plugin-assi-capture"
+
+[lib]
+name = "assi_capture"
+
+[dependencies]
+tauri = { version = "2", default-features = false }
+serde.workspace = true
+serde_json = "1"
+base64 = "0.22"
+
+[build-dependencies]
+tauri-plugin = { version = "2", features = ["build"] }

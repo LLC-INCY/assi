@@ -1,0 +1,30 @@
+# Build outputs and local tooling
+/target/
+/node_modules/
+/apps/client/node_modules/
+/apps/client/dist/
+/apps/client/src-tauri/gen/
+/apps/client/android-host/android/build/
+/apps/client/android-host/android/.gradle/
+/apps/client/android-host/android/.tauri/
+/.validation/
+/.impeccable/
+.DS_Store
+*.log
+
+# Runtime data and private configuration
+*.sqlite3
+*.sqlite3-*
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+local.properties
+key.properties
+
+/ci-artifacts/

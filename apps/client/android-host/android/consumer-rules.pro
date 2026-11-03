@@ -1,0 +1,3 @@
+-keep class app.assi.capture.CapturePlugin { *; }
+-keep class app.assi.capture.CaptureArgs { *; }
+-keep class app.assi.capture.CaptureService { *; }

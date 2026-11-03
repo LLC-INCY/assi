@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-session-windows"
+description = "Enables the session_windows command without any pre-configured scope."
+commands.allow = ["session_windows"]
+
+[[permission]]
+identifier = "deny-session-windows"
+description = "Denies the session_windows command without any pre-configured scope."
+commands.deny = ["session_windows"]

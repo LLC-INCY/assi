@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-session-release-input"
+description = "Enables the session_release_input command without any pre-configured scope."
+commands.allow = ["session_release_input"]
+
+[[permission]]
+identifier = "deny-session-release-input"
+description = "Denies the session_release_input command without any pre-configured scope."
+commands.deny = ["session_release_input"]

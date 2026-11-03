@@ -1,0 +1,10 @@
+{
+  "identifier": "overlay-readonly",
+  "description": "Isolated local annotation display; no input or session mutation",
+  "windows": [
+    "annotations-overlay"
+  ],
+  "permissions": [
+    "allow-session-overlay-snapshot"
+  ]
+}

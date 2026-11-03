@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-session-file-resume"
+description = "Enables the session_file_resume command without any pre-configured scope."
+commands.allow = ["session_file_resume"]
+
+[[permission]]
+identifier = "deny-session-file-resume"
+description = "Denies the session_file_resume command without any pre-configured scope."
+commands.deny = ["session_file_resume"]

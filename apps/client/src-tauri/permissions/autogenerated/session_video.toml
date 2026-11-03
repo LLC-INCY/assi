@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-session-video"
+description = "Enables the session_video command without any pre-configured scope."
+commands.allow = ["session_video"]
+
+[[permission]]
+identifier = "deny-session-video"
+description = "Denies the session_video command without any pre-configured scope."
+commands.deny = ["session_video"]

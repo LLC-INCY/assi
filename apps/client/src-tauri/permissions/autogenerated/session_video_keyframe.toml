@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-session-video-keyframe"
+description = "Enables the session_video_keyframe command without any pre-configured scope."
+commands.allow = ["session_video_keyframe"]
+
+[[permission]]
+identifier = "deny-session-video-keyframe"
+description = "Denies the session_video_keyframe command without any pre-configured scope."
+commands.deny = ["session_video_keyframe"]

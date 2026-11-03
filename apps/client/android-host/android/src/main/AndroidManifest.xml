@@ -1,0 +1,9 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+    <application>
+        <service android:name="app.assi.capture.CaptureService"
+            android:exported="false" android:stopWithTask="true"
+            android:foregroundServiceType="mediaProjection" />
+    </application>
+</manifest>

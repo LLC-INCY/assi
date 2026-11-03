@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-access-resume"
+description = "Enables the access_resume command without any pre-configured scope."
+commands.allow = ["access_resume"]
+
+[[permission]]
+identifier = "deny-access-resume"
+description = "Denies the access_resume command without any pre-configured scope."
+commands.deny = ["access_resume"]

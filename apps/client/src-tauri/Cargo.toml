@@ -1,0 +1,43 @@
+[package]
+name = "assi-client"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lib]
+name = "assi_client"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+assi-core = { path = "../../../crates/assi-core" }
+tauri = { version = "2", features = [] }
+serde.workspace = true
+uuid.workspace = true
+serde_json = "1"
+tokio = { version = "1", features = ["time", "sync", "macros", "rt"] }
+assi-relay = { path = "../../../crates/assi-relay" }
+assi-session = { path = "../../../crates/assi-session" }
+assi-audio = { path = "../../../crates/assi-audio" }
+assi-video = { path = "../../../crates/assi-video" }
+assi-access = { path = "../../../crates/assi-access" }
+assi-folders = { path = "../../../crates/assi-folders" }
+assi-terminal = { path = "../../../crates/assi-terminal" }
+assi-platform = { path = "../../../crates/assi-platform" }
+
+tempfile = "3"
+
+[dev-dependencies]
+tauri = { version = "2", features = ["test"] }
+tempfile = "3"
+rusqlite = { version = "0.41.1", features = ["bundled"] }
+
+
+[target.'cfg(not(target_os = "android"))'.dependencies]
+tauri-plugin-dialog = "2"
+
+[target.'cfg(target_os = "android")'.dependencies]
+assi-capture = { package = "tauri-plugin-assi-capture", path = "../android-host" }

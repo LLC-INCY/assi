@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-session-display"
+description = "Enables the session_display command without any pre-configured scope."
+commands.allow = ["session_display"]
+
+[[permission]]
+identifier = "deny-session-display"
+description = "Denies the session_display command without any pre-configured scope."
+commands.deny = ["session_display"]

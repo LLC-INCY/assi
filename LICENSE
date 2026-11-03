@@ -1,0 +1,42 @@
+Assi No-Sale License 1.0
+SPDX-License-Identifier: LicenseRef-Assi-NoSale-1.0
+
+Copyright (c) 2026 JustYay and contributors.
+
+1. Permission
+Subject to the conditions below, permission is granted, without charge, to use,
+copy, study, modify, build and distribute this software and its accompanying
+project materials (the "Software"), including modified versions.
+
+2. No sale
+You may not sell, rent, commercially license, or charge for copies of or access
+to the Software or a modified or derivative version without prior written
+permission from the relevant copyright holder. You may not avoid this restriction
+by including the Software or a derivative version in a paid bundle or product.
+Free distribution and modification are permitted. Using the Software internally
+in a business is not, by itself, a sale of the Software.
+
+3. Notices and modified versions
+Retain this license and the applicable copyright notices in redistributed copies.
+Clearly identify substantial modifications and do not present an unofficial fork
+as an official Assi release. You may not grant recipients permission to sell the
+Software or its derivative versions under a different license. These conditions
+do not grant rights to third-party trademarks.
+
+4. Third-party components
+Separately licensed third-party components are governed by their own licenses.
+This license does not replace their notices or restrict rights granted by their
+respective copyright holders.
+
+5. Warranty and liability
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NON-INFRINGEMENT. TO THE EXTENT PERMITTED BY APPLICABLE LAW, THE
+AUTHORS AND COPYRIGHT HOLDERS ARE NOT LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY ARISING FROM THE SOFTWARE OR ITS USE.
+
+6. Other permissions
+Rights not expressly granted are reserved. Separate written permission from the
+relevant copyright holder may permit an otherwise restricted use. This license
+is a source-available license with a no-sale restriction, not an OSI open-source
+license.

@@ -1,0 +1,20 @@
+{
+  "name": "assi-workspace",
+  "version": "0.6.0",
+  "private": true,
+  "scripts": {
+    "ui:build": "node scripts/build-ui.mjs",
+    "dev": "npm run ui:build && cd apps/client && tauri dev",
+    "build": "npm run ui:build && cd apps/client && tauri build",
+    "build:debug": "npm run ui:build && cd apps/client && tauri build --debug",
+    "android:init": "npm run ui:build && npm --prefix apps/client run tauri -- android init --ci && node scripts/ci-prepare-android.mjs",
+    "android:dev": "npm run ui:build && npm --prefix apps/client run tauri -- android dev",
+    "check": "node --check apps/client/ui/app.js && node --check apps/client/ui/session-ui.js && node --check apps/client/ui/files-ui.js && node --check apps/client/ui/session-view.js && node --check apps/client/ui/session-audio.js && node --check apps/client/ui/overlay.js && node --check apps/client/ui/session-video.js && node --check apps/client/ui/session-tools.js && node --check apps/client/ui/session-access.js && node --check apps/client/ui/session-recording.js && node --check apps/client/ui/session-windows.js && npm run test:ui && cargo fmt --all -- --check && cargo clippy --workspace --all-targets --locked -- -D warnings && cargo test --workspace --locked && node --test scripts/ipc-permissions.test.mjs",
+    "android:build": "npm run ui:build && npm --prefix apps/client run tauri -- android build --debug --target aarch64 --apk --ci",
+    "test:ui": "node --test apps/client/ui/*.test.mjs"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "2.12.4"
+  },
+  "license": "LicenseRef-Assi-NoSale-1.0"
+}

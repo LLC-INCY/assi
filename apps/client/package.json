@@ -1,0 +1,9 @@
+{
+  "name": "assi-client",
+  "private": true,
+  "version": "0.6.0",
+  "scripts": {
+    "tauri": "tauri"
+  },
+  "license": "LicenseRef-Assi-NoSale-1.0"
+}

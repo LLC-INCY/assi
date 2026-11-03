@@ -1,0 +1,14 @@
+[package]
+name = "assi-video"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+serde.workspace = true
+thiserror.workspace = true
+image = { version = "0.25", default-features = false, features = ["jpeg"] }
+
+[target.'cfg(any(target_os = "macos", target_os = "windows", target_os = "linux"))'.dependencies]
+openh264 = { version = "=0.9.9", default-features = false, features = ["source"] }
