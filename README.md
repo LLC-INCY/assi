@@ -6,7 +6,7 @@
 
 Windows · macOS · Linux · Android
 
-[![Build](https://github.com/JustYay/assi/actions/workflows/build.yml/badge.svg)](https://github.com/JustYay/assi/actions/workflows/build.yml)
+[![Build](https://github.com/LLC-INCY/assi/actions/workflows/build.yml/badge.svg)](https://github.com/LLC-INCY/assi/actions/workflows/build.yml)
 ![Version](https://img.shields.io/badge/version-0.6.0-a5f3d1?style=flat-square&labelColor=20272b)
 ![Status](https://img.shields.io/badge/status-early%20preview-e6c58a?style=flat-square&labelColor=20272b)
 ![Rust](https://img.shields.io/badge/core-Rust-f5f7f6?style=flat-square&labelColor=20272b)
@@ -61,7 +61,7 @@ Windows · macOS · Linux · Android
 
 ### Автоматические сборки
 
-GitHub Actions собирает пакеты для **Windows x64, Linux x64, macOS Apple Silicon и Intel, Android arm64**. Проверки и сборки запускаются на push в `main`, pull request и вручную. Артефакты можно скачать в завершённом запуске [Build](https://github.com/JustYay/assi/actions/workflows/build.yml) в разделе **Artifacts** (нужен вход в GitHub).
+GitHub Actions собирает пакеты для **Windows x64, Linux x64, macOS Apple Silicon и Intel, Android arm64**. Проверки и сборки запускаются на push в `main`, pull request и вручную. Артефакты можно скачать в завершённом запуске [Build](https://github.com/LLC-INCY/assi/actions/workflows/build.yml) в разделе **Artifacts** (нужен вход в GitHub).
 
 Сборки для тестирования не имеют production-подписи или notarization; Android использует debug-подпись. Это не публикация в магазинах. Статус конкретной платформы смотрите в её job: наличие workflow само по себе не подтверждает успешную сборку.
 

@@ -48,7 +48,7 @@ AGP 9.3.1, Gradle 9.6.1, Kotlin 2.2.10 и совместимые парамет�
 
 ## GitHub Actions
 
-[Build](https://github.com/JustYay/assi/actions/workflows/build.yml) запускается
+[Build](https://github.com/LLC-INCY/assi/actions/workflows/build.yml) запускается
 на push в `main`, pull request и вручную. Отдельная job проверяет форматирование,
 Clippy и тесты; сборки идут независимо для Windows x64 (NSIS), Linux x64
 (DEB/AppImage), macOS arm64/x64 (ZIP с `.app`) и Android arm64 (debug APK).
