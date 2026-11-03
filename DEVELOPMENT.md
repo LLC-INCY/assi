@@ -43,7 +43,7 @@ npm run android:build
 
 `android:init` также запускает `scripts/ci-prepare-android.mjs`: фиксирует SDK 37,
 AGP 9.3.1, Gradle 9.6.1, Kotlin 2.2.10 и совместимые параметры DSL.
-В CI используется JDK 17 и NDK 27.2.12479018. Установите `platforms;android-37`
+В CI используется JDK 17 и NDK 27.2.12479018. Установите `platforms;android-37.0`
 и `build-tools;36.0.0` через SDK Manager.
 
 ## GitHub Actions
@@ -88,6 +88,6 @@ Tauri по Cargo build metadata и объединяет manifest foreground serv
 
 ## Дополнения 0.4.0
 
-macOS требует 13+ для ScreenCaptureKit; Xcode/Swift toolchain нужен при сборке assi-audio. Клиент добавляет /usr/lib/swift в LC_RPATH и описание разрешения записи экрана/системного звука в Info.plist. Микрофон не запрашивается. Windows backend аудио проверяется отдельно: `cargo check -p assi-audio --target x86_64-pc-windows-gnu --locked`; это не полная Windows сборка приложения.
+macOS требует 13+ для ScreenCaptureKit. Сборке нужен Xcode 26+ с актуальным macOS SDK из-за Swift/Metal-зависимостей; CI выбирает Xcode 26.3. Версия SDK сборки отличается от минимальной версии ОС приложения. Клиент добавляет /usr/lib/swift в LC_RPATH и описание разрешения записи экрана/системного звука в Info.plist. Микрофон не запрашивается. Windows backend аудио проверяется отдельно: `cargo check -p assi-audio --target x86_64-pc-windows-gnu --locked`; это не полная Windows сборка приложения.
 
 `npm run test:ui` проверяет очереди ввода, режимы обзора/рисования, дробную прокрутку и отзыв аудио. `scripts/responsive-review.mjs` создаёт только тестовый стенд; `scripts/fixtures/screen-fixture.jpg` — синтетический экран без пользовательских данных. Он никогда не включается в native bundle.
