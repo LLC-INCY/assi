@@ -11,7 +11,8 @@ use crate::{
 
 #[derive(Default)]
 pub(super) struct Desktop {
-    monitor: Option<(Monitor, Rect)>,
+    // Native monitor handles (HMONITOR on Windows) never cross worker threads.
+    monitor: Option<MonitorSnapshot>,
     selected_id: Option<u32>,
     pub(super) quality: CaptureQuality,
     input: Option<Enigo>,
@@ -25,6 +26,60 @@ struct Rect {
     y: i32,
     width: u32,
     height: u32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct MonitorSnapshot {
+    id: u32,
+    name: String,
+    rect: Rect,
+}
+
+impl MonitorSnapshot {
+    fn read(monitor: &Monitor) -> Result<Self> {
+        Ok(Self {
+            id: monitor
+                .id()
+                .map_err(|_| PlatformError::MonitorUnavailable)?,
+            name: monitor
+                .name()
+                .map_err(|_| PlatformError::MonitorUnavailable)?,
+            rect: Rect::read(monitor)?,
+        })
+    }
+
+    fn validate(&self, current: &Self) -> Result<()> {
+        if self == current {
+            Ok(())
+        } else {
+            Err(PlatformError::MonitorChanged)
+        }
+    }
+
+    fn resolve(&self) -> Result<Monitor> {
+        let monitors = Monitor::all().map_err(|_| PlatformError::MonitorUnavailable)?;
+        let monitor = unique_monitor(monitors, self.id, |monitor| {
+            monitor.id().map_err(|_| PlatformError::MonitorUnavailable)
+        })?;
+        self.validate(&Self::read(&monitor)?)?;
+        Ok(monitor)
+    }
+}
+
+// Never fall back to another/primary display after capture established a binding.
+// Reject ambiguous IDs rather than choosing an arbitrary native handle.
+fn unique_monitor<T>(
+    monitors: impl IntoIterator<Item = T>,
+    expected_id: u32,
+    mut id: impl FnMut(&T) -> Result<u32>,
+) -> Result<T> {
+    let mut selected = None;
+    for monitor in monitors {
+        if id(&monitor)? == expected_id && selected.replace(monitor).is_some() {
+            return Err(PlatformError::MonitorChanged);
+        }
+    }
+    selected.ok_or(PlatformError::MonitorChanged)
 }
 
 impl Rect {
@@ -153,11 +208,7 @@ impl Desktop {
 
     pub(super) fn selected_display(&self) -> Option<String> {
         self.selected_id
-            .or_else(|| {
-                self.monitor
-                    .as_ref()
-                    .and_then(|(monitor, _)| monitor.id().ok())
-            })
+            .or_else(|| self.monitor.as_ref().map(|monitor| monitor.id))
             .map(|id| id.to_string())
     }
 
@@ -169,46 +220,48 @@ impl Desktop {
     }
 
     pub(super) fn capture_rgba(&mut self) -> Result<CapturedRgba> {
-        if self.monitor.is_none() {
-            let monitor = Monitor::all()
-                .map_err(|_| PlatformError::CaptureUnavailable)?
-                .into_iter()
-                .find(|monitor| {
-                    self.selected_id.map_or_else(
-                        || monitor.is_primary().unwrap_or(false),
-                        |id| monitor.id().ok() == Some(id),
-                    )
-                })
-                .ok_or(PlatformError::NoMonitor)?;
-            let rect = Rect::read(&monitor)?;
-            let image = monitor
-                .capture_image()
-                .map_err(|_| PlatformError::CaptureUnavailable)?;
-            let frame = captured_rgba(image)?;
-            self.monitor = Some((monitor, rect));
-            return Ok(frame);
-        }
-        let (monitor, rect) = self.monitor.as_ref().ok_or(PlatformError::NoMonitor)?;
-        if Rect::read(monitor)? != *rect {
-            return Err(PlatformError::MonitorChanged);
+        let monitor = match self.monitor.as_ref() {
+            Some(snapshot) => snapshot.resolve()?,
+            None => {
+                let monitors = Monitor::all().map_err(|_| PlatformError::CaptureUnavailable)?;
+                if let Some(id) = self.selected_id {
+                    unique_monitor(monitors, id, |monitor| {
+                        monitor.id().map_err(|_| PlatformError::MonitorUnavailable)
+                    })?
+                } else {
+                    monitors
+                        .into_iter()
+                        .find(|monitor| monitor.is_primary().unwrap_or(false))
+                        .ok_or(PlatformError::NoMonitor)?
+                }
+            }
+        };
+        let snapshot = MonitorSnapshot::read(&monitor)?;
+        if let Some(expected) = self.monitor.as_ref() {
+            expected.validate(&snapshot)?;
         }
         let image = monitor
             .capture_image()
             .map_err(|_| PlatformError::CaptureUnavailable)?;
-        captured_rgba(image)
+        // A display reconfiguration during capture must not establish new input
+        // coordinates for an image from the previous configuration.
+        snapshot.validate(&MonitorSnapshot::read(&monitor)?)?;
+        let frame = captured_rgba(image)?;
+        self.monitor = Some(snapshot);
+        Ok(frame)
     }
 
     pub(super) fn apply_input(&mut self, event: InputEvent) -> Result<()> {
         if is_wayland() {
             return Err(PlatformError::WaylandControlUnsupported);
         }
-        let (monitor, rect) = self
+        let snapshot = self
             .monitor
             .as_ref()
             .ok_or(PlatformError::CaptureRequired)?;
-        if Rect::read(monitor)? != *rect {
-            return Err(PlatformError::MonitorChanged);
-        }
+        // Resolve on this worker; only portable identity/geometry is retained.
+        let _monitor = snapshot.resolve()?;
+        let rect = snapshot.rect;
         // Validate before creating the native input connection.
         if let InputEvent::Wheel { x, y } = &event {
             validate_scroll(*x, *y)?;
@@ -442,6 +495,63 @@ fn encode_frame(image: RgbaImage, quality: CaptureQuality) -> Result<Vec<u8>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn platform_can_move_between_serialized_workers() {
+        fn assert_send<T: Send>() {}
+        assert_send::<crate::Platform>();
+    }
+
+    #[test]
+    fn captured_monitor_resolution_never_falls_back_or_accepts_ambiguous_id() {
+        assert_eq!(unique_monitor([3, 1, 2], 1, |id| Ok(*id)), Ok(1));
+        assert_eq!(
+            unique_monitor([2, 3], 1, |id| Ok(*id)),
+            Err(PlatformError::MonitorChanged)
+        );
+        assert_eq!(
+            unique_monitor([1, 2, 1], 1, |id| Ok(*id)),
+            Err(PlatformError::MonitorChanged)
+        );
+        assert_eq!(
+            unique_monitor([1], 1, |_| Err(PlatformError::MonitorUnavailable)),
+            Err(PlatformError::MonitorUnavailable)
+        );
+    }
+
+    #[test]
+    fn captured_monitor_binding_rejects_identity_and_geometry_changes() {
+        let expected = MonitorSnapshot {
+            id: 7,
+            name: "display-7".into(),
+            rect: Rect {
+                x: -1920,
+                y: 0,
+                width: 1920,
+                height: 1080,
+            },
+        };
+        assert_eq!(expected.validate(&expected), Ok(()));
+        let mut changes = vec![expected.clone(); 6];
+        changes[0].id = 8;
+        changes[1].name = "replacement".into();
+        changes[2].rect.x = 0;
+        changes[3].rect.y = 20;
+        changes[4].rect.width = 2560;
+        changes[5].rect.height = 1440;
+        for changed in changes {
+            assert_eq!(
+                expected.validate(&changed),
+                Err(PlatformError::MonitorChanged)
+            );
+        }
+        let mut platform = crate::Platform::new();
+        platform.inner.monitor = Some(expected);
+        assert_eq!(platform.selected_display().as_deref(), Some("7"));
+        platform.release_inputs().unwrap();
+        assert!(platform.selected_display().is_none());
+        assert!(platform.inner.input.is_none());
+    }
 
     #[test]
     fn normalized_coordinates_use_monitor_origin_and_last_pixel() {

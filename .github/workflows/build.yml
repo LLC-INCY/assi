@@ -48,6 +48,7 @@ jobs:
         with:
           shared-key: quality
           save-if: ${{ github.ref == 'refs/heads/main' }}
+          cache-on-failure: true
       - run: npm ci
       - run: npm run ui:build
       - run: node --test scripts/ci-*.test.mjs
@@ -106,7 +107,7 @@ jobs:
             libssl-dev libayatana-appindicator3-dev librsvg2-dev patchelf \
             libclang-dev libxcb1-dev libxcb-randr0-dev libxcb-shape0-dev \
             libxcb-xfixes0-dev libxrandr-dev libdbus-1-dev libpipewire-0.3-dev \
-            libwayland-dev libegl-dev libxkbcommon-dev libxkbcommon-x11-dev
+            libwayland-dev libegl-dev libgbm-dev libxkbcommon-dev libxkbcommon-x11-dev
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '24'
@@ -119,6 +120,7 @@ jobs:
         with:
           shared-key: desktop-${{ matrix.target }}
           save-if: ${{ github.ref == 'refs/heads/main' }}
+          cache-on-failure: true
       - run: npm ci
       - name: Build desktop packages
         env:
@@ -178,6 +180,7 @@ jobs:
         with:
           shared-key: android-arm64
           save-if: ${{ github.ref == 'refs/heads/main' }}
+          cache-on-failure: true
       - run: npm ci
       - name: Generate and configure native project
         run: npm run android:init
